@@ -236,69 +236,7 @@ crimes_ny.then(function(data){
   },2000);
       
   
-   /* setTimeout(function() {
-    map.data.forEach(function (feature){
-      
-      crimenes.push([0,feature.getProperty("BoroCD")]);
-    let gaGeom = feature.getGeometry();
-    //let poly = new google.maps.Polygon({paths:gaGeom.getAt(0).getArray()});
-    let contains = false;
-    let poly = gaGeom.getAt(0).getArray();
-    let multiGaGeom = gaGeom.getArray();
-    
-    
-    if(poly.length == 1){
-      let polygon;
-      
-      
-       for(let i in multiGaGeom){
-         let aux = gaGeom.getAt(i).getArray();
-         let polyIn = aux[0].getArray();
-          polygon = new google.maps.Polygon({paths:polyIn});
-
-         for(let latLng in puntosCrimenes ){
-          contains = google.maps.geometry.poly.containsLocation(puntosCrimenes[latLng], polygon);
-          
-          
-
-          if(contains == true){
-            crimenes[crimenes.length-1][0]+=1;
-          }
-       } 
-        
-        
-       }
-       
-    } else{
-
-      let polygon = new google.maps.Polygon({
-        paths: poly
-      });
-      for (let latLng in puntosCrimenes) {
-        contains = google.maps.geometry.poly.containsLocation(puntosCrimenes[latLng], polygon);
-
-        if (contains == true) {
-          crimenes[crimenes.length - 1][0]+=1;
-        }
-
-      }
-      }
-    
-    
-    if(crimenes.length == 59){
-      
-      crimenes = mergeSort(crimenes);
-      for(let i in crimenes){
-        borosCrime.push(crimenes[i][1]);
-      }
-      $("#safetyBtn").prop("disabled",false);
-
-    }
-    
-  });
- }, 1000); 
- */
-
+   
 })
 /* ********************************************************* */
 /* Affordable */
