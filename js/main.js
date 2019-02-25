@@ -5,6 +5,8 @@
 /********************  Variables ******************************/
 
 let neighborhood_names;
+let dataffor;
+let afforonce = false;
 let ny_districts_shapes;
 let crimes_ny;
 let housing_by_building;
@@ -33,13 +35,22 @@ let safetyShowing = false;
 let afforabilityShowing = false;
 let crimesMax = 0,
   crimesMin = 700000;
-  let sumCrimes=0;
+let sumCrimes = 0;
+let affor = {};
+let afforMax = 0,
+  afforMin = 7000000;
+let neighborhoodArray = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"];
+let manhattan = [],
+  bronx = [],
+  brooklyn = [],
+  queens = [],
+  statenislan = [];
 /* *************************************************************** */
 
 $(document).ready(function () {
   $("#distanceBtn").prop("disabled", true);
   $("#safetyBtn").prop("disabled", true);
-  
+
 
 
 
@@ -62,9 +73,7 @@ $(document).ready(function () {
       dataHeat.push(latLng);
     } */
 
-    map.data.addListener('mouseover', function (event) {
-      document.getElementById('districtNumber').textContent = event.feature.getProperty('BoroCD');
-    });
+
 
   });
   /* ******************************************************** */
@@ -73,39 +82,82 @@ $(document).ready(function () {
 
   crimes_ny = getData("https://data.cityofnewyork.us/resource/9s4h-37hy.json?cmplnt_fr_dt=2015-12-31");
   crimes_ny.then(function (data) {
-
-
-    for (let index in data) {
-      puntosCrimenes.push(new google.maps.LatLng(data[index].lat_lon.coordinates[1], data[index].lat_lon.coordinates[0]));
-    }
+    setTimeout(function () {
+      for (let index in data) {
+        puntosCrimenes.push(new google.maps.LatLng(data[index].lat_lon.coordinates[1], data[index].lat_lon.coordinates[0]));
+      }
+      crimes();
+    }, 3000);
   })
   /* ********************************************************* */
   /* Affordable */
   housing_by_building = getData("https://data.cityofnewyork.us/api/views/hg8x-zxpr/rows.json?accessType=DOWNLOAD");
   housing_by_building.then(function (data) {
-    for (let i in data) {
+    let sum = 0;
+    let datos = data.data;
+    console.log(datos);
+    for (let i in datos) {
+      let value = parseFloat(datos[i][33], 10);
+      let neighborhood = datos[i][15];
 
+      if (neighborhood == "Manhattan") {
+        neighborhood = "1";
+      } else if (neighborhood == "Bronx") {
+        neighborhood = "2";
+      } else if (neighborhood == "Brooklyn") {
+        neighborhood = "3";
+      } else if (neighborhood == "Queens") {
+        neighborhood = "4";
+      } else if (neighborhood == "Staten Island") {
+        neighborhood = "5";
+      } else {
+        console.log("error");
+      }
+
+      neighborhood += datos[i][19].substring(3, 5);
+      sum += value;
+      if (value != 0) {
+
+        if (typeof affor[neighborhood] === "undefined") {
+          affor[neighborhood] = value;
+        } else {
+          affor[neighborhood] += value;
+        }
+
+      }
     }
+    console.log("sum all low income: " + sum);
+    console.log(affor);
   });
   /* ************************************************************************* */
   /******************** EVENTS **************************************/
 
 
-  $("#clean").click(function () {
-    markerCluster.clearMarkers();
-  });
-
-  $("#search").click(function () {
-    markerCluster.addMarkers(markers);
-  });
 
   $("#distanceBtn").click(function () {
+    distanceShowing = safetyShowing = afforabilityShowing = false;
+    document.getElementById("census-variable").value = "select-option";
+    document.getElementById('data-caret').style.display = 'none';
+    document.getElementById('data-box2').style.display = 'none';
+    map.data.setStyle(styleFeature);
+    $(".color-key").css({
+      "display": "none"
+    });
+    document.getElementById('census-min').textContent = " ";
+    document.getElementById('census-max').textContent = " ";
 
-    
+
   });
 
   $("#safetyBtn").click(function () {
-    
+
+  });
+
+  $("#CSVdistance").click(function () {
+    $("#distanceExport").table2csv({
+
+    });
+
   });
 
   /******************** EVENTS **************************************/
@@ -127,14 +179,23 @@ function calculateDistanceAndStuff() {
   var marker = new google.maps.Marker({
     position: {
       lat: 40.730610,
-      lng: -73.935242
+      lng: -73.935242,
     },
     map: map,
-    title: 'NYU Stern School of Business'
+    title: 'NYU Stern School of Business',
+    animation: google.maps.Animation.DROP,
   });
   /* *****************************************************/
 
   map.data.forEach(function (feature) {
+
+    feature.setProperty("Affordability", affor[feature.getProperty("BoroCD")]);
+    if (feature.getProperty("Affordability") < afforMin) {
+      afforMin = feature.getProperty("Affordability");
+    }
+    if (feature.getProperty("Affordability") > afforMax) {
+      afforMax = feature.getProperty("Affordability");
+    }
 
     let distanciaPolig; //Distance of polygon from NYU
     let gaGeom = feature.getGeometry(); //Getting geometry form GeoJSON
@@ -210,16 +271,14 @@ function calculateDistanceAndStuff() {
     if (distance.length == 59) { // If it has finished calculating all distances
       console.log("dist Finishes");
       $("#distanceBtn").prop("disabled", false);
-      crimes(); // We move to crimes
+      // We move to crimes
+      populateDistanceTable();
     }
 
   });
 }
 
 function crimes() {
-
-  
-
   map.data.forEach(function (feature) {
 
     let type = feature.getProperty("Type");
@@ -270,44 +329,18 @@ function crimes() {
     }
 
     sumCrimes += feature.getProperty("Crimes");
-    if(sumCrimes >=994){
+    if (sumCrimes >= 994) {
       $(".animationload").fadeOut();
+      console.log("Crimes Finish");
     }
 
   });
-  /* console.log(listPolygons);
-  console.log(listMultiPolygons);
-  for (let poly in listPolygons) {
 
-    crimenes.push([0, listPolygons[poly][1]]);
-    for (let punto in puntosCrimenes) {
-      contains = google.maps.geometry.poly.containsLocation(puntosCrimenes[punto], listPolygons[poly][0]);
-      if (contains == true) {
-        crimenes[crimenes.length - 1][0] += 1;
-      }
-    }
-  }
-
-  for (let poly in listMultiPolygons) {
-    crimenes.push([0, listMultiPolygons[poly][1]]);
-    for (let subpoly in listMultiPolygons[poly][0]) {
-      for (let punto in puntosCrimenes) {
-        contains = google.maps.geometry.poly.containsLocation(puntosCrimenes[punto], listMultiPolygons[poly][0][subpoly]);
-        if (contains == true) {
-          crimenes[crimenes.length - 1][0] += 1;
-        }
-      }
-    }
-  }
-  crimenes = mergeSort(crimenes);
-  /* const middle = Math.floor(distance.length / 2) // get the middle item of the array rounded down
-  crimenes = crimenes.slice(0, middle) // */
-  /* or (let i in crimenes) {
-    borosCrime.push(crimenes[i][1]);
-  }  */
   $("#safetyBtn").prop("disabled", false);
 
 }
+
+
 
 /* ************** Function to calculate center of each district *********** */
 
@@ -399,32 +432,34 @@ function merge(left, right) {
 
 /* ************************************** */
 
-function changeOption(){
+function changeOption() {
   let value = document.getElementById("census-variable").value;
-  if(value == "Distance"){
+  if (value == "Distance") {
     distances();
   }
-  if(value == "Safety"){
+  if (value == "Safety") {
     safety();
   }
-  if(value == "Affordability"){
-    affordability();
+  if (value == "Affordability") {
+    Affordability();
   }
 
 }
 
-function distances(){
+function distances() {
+  $("." + $('#colors').attr('class')).css({
+    "display": "flex"
+  });
   distanceShowing = true;
   safetyShowing = false;
   afforabilityShowing = false;
 
-  $(".color-key").css({
-    "background": "linear-gradient(to right, rgba(255,0,99,1), rgba(255,0,99,0))"
-  });
+  $('#colors').removeClass($('#colors').attr('class')).addClass('color-key');
+
   document.getElementById('census-min').textContent =
-  Math.round((distanciaMin/1000) * 100) / 100 + "Km";
+    Math.round((distanciaMin / 1000) * 100) / 100 + "Km";
   document.getElementById('census-max').textContent =
-  Math.round((distanciaMax/1000) * 100) / 100 + "Km";
+    Math.round((distanciaMax / 1000) * 100) / 100 + "Km";
 
   map.data.setStyle(function (feature) {
 
@@ -457,11 +492,12 @@ function distances(){
   });
 }
 
-function safety(){
-
-  $(".color-key").css({
-    "background": "linear-gradient(to right, rgba(51,255,252,0), rgba(51,255,252,1))"
+function safety() {
+  $("." + $('#colors').attr('class')).css({
+    "display": "flex"
   });
+
+  $('#colors').removeClass($('#colors').attr('class')).addClass('color-key2');
   safetyShowing = true;
   distanceShowing = false;
   afforabilityShowing = false;
@@ -475,26 +511,108 @@ function safety(){
 
     var delta = (feature.getProperty('Crimes') - crimesMin) /
       (crimesMax - crimesMin);
-   
-      
-      var outlineWeight = 0.5,
-        zIndex = 1;
-      let id = feature.getProperty('OBJECTID');
-      if (id >= 100) {
-        outlineWeight = zIndex = 2;
-      }
-      return {
-        fillColor: "#33FFFC",
-        strokeWeight: outlineWeight,
-        strokeColor: "white",
-        fillOpacity: delta,
-        zIndex: zIndex,
-      };
-    
+
+
+    var outlineWeight = 0.5,
+      zIndex = 1;
+    let id = feature.getProperty('OBJECTID');
+    if (id >= 100) {
+      outlineWeight = zIndex = 2;
+    }
+    return {
+      fillColor: "#33FFFC",
+      strokeWeight: outlineWeight,
+      strokeColor: "white",
+      fillOpacity: delta,
+      zIndex: zIndex,
+    };
+
   })
-  
+
 }
 
-function Affordability(){
-  
+function Affordability() {
+
+  $("." + $('#colors').attr('class')).css({
+    "display": "flex"
+  });
+  $('#colors').removeClass($('#colors').attr('class')).addClass('color-key3');
+  safetyShowing = false;
+  distanceShowing = false;
+  afforabilityShowing = true;
+  var low = [5, 69, 54]; // color of smallest datum
+  var high = [151, 83, 34];
+  document.getElementById('census-min').textContent =
+    Math.floor(afforMin);
+  document.getElementById('census-max').textContent =
+    Math.floor(afforMax);
+
+  map.data.setStyle(function (feature) {
+
+
+    var delta = (feature.getProperty('Affordability') - afforMin) /
+      (afforMax - afforMin);
+
+    var color = [];
+    for (var i = 0; i < 3; i++) {
+      // calculate an integer color based on the delta
+      color[i] = (high[i] - low[i]) * delta + low[i];
+    }
+
+
+    var outlineWeight = 0.5,
+      zIndex = 1;
+    let id = feature.getProperty('OBJECTID');
+    if (id >= 100) {
+      outlineWeight = zIndex = 2;
+    } //12E900
+    return {
+      fillColor: 'hsl(' + color[0] + ',' + color[1] + '%,' + color[2] + '%)',
+      strokeWeight: outlineWeight,
+      strokeColor: "white",
+      fillOpacity: 0.75,
+      zIndex: zIndex,
+    };
+
+
+  })
+
+
+}
+
+function populateDistanceTable() {
+  distance = mergeSort(distance);
+
+  for (let i = 0; i < 10; i++) {
+    let data = ` `;
+    let BoroCD = distance[i][1];
+    let name = "";
+    if (BoroCD >= 100 && BoroCD < 200) {
+      name = "Manhattan";
+    } else if (BoroCD >= 200 && BoroCD < 300) {
+      name = "Bronx";
+    } else if (BoroCD >= 300 && BoroCD < 400) {
+      name = "Brooklyn";
+    } else if (BoroCD >= 400 && BoroCD < 500) {
+      name = "Queens";
+    } else {
+      name = "Staten Island";
+    }
+    let distancia = Math.round((distance[i][0] / 1000) * 100) / 100;
+    BoroCD = BoroCD % 100;
+
+    data += `<tr>
+    <th scope="row">${i+1}</th>
+    <td>${name}</td>
+    <td>${BoroCD}</td>
+    <td>${distancia}</td>
+  </tr>
+    `
+
+    console.log(data);
+    $("#distanceTable").append(data);
+
+  }
+
+  $("#distanceTable").append(`</tbody>`);
 }

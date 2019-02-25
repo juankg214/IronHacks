@@ -27,7 +27,7 @@
         </li>
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Ranking <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="#tables">Ranking <span class="sr-only">(current)</span></a>
           </li>
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
@@ -53,9 +53,11 @@
             </select>
             </div>
             <div id="legend">
-              <div id="census-min">min</div>
-              <div class="color-key"><span id="data-caret">&#x25c6;</span></div>
-              <div id="census-max">max</div>
+              
+              <div id="census-min"></div>
+              <div class="color-key" id="colors"><span id="data-caret">&#x25c6;</span></div>
+              <div id="census-max"></div>
+            
             </div>
           </div>
           <div id="data-box" class="nicebox">
@@ -86,13 +88,96 @@
         </div>
         <div class="d-flex justify-content-end mt-3">
           <div class="btn-toolbar">
-            <button type="button" id="distanceBtn" class="btn btn-secondary ml-2">Clean</button>
-            <button type="button" id="safetyBtn" class="btn btn-primary">Search</button>
+            <button type="button" id="distanceBtn" class="btn btn-primary ml-2">Clean</button>
+            
           </div>
         </div>
-        <h2>District Number = <span id="districtNumber"></span></h2>
       </div>
     </div>
+  </div>
+  <div class="container-fluid mt-4" id="tables">
+    <h1>Distance</h1>
+    <table class="table table-hover table-dark" id="distanceExport">
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Neighbourhood</th>
+          <th scope="col">District</th>
+          <th scope="col">Km</th>
+        </tr>
+      </thead>
+      <tbody id="distanceTable">
+        
+        
+      </table>
+
+      <div class="d-flex justify-content-end mb-3">
+          <div class="btn-toolbar">
+            <button type="button" id="CSVdistance" class="btn btn-primary ml-2">Export CSV</button>
+            </div>
+        </div>
+      <h1>Safety</h1>
+      <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Neighbourhood</th>
+              <th scope="col">District</th>
+              <th scope="col">Km</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1</th>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
+              <td>Jacob</td>
+              <td>Thornton</td>
+              <td>@fat</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
+              <td>Larry</td>
+              <td>the Bird</td>
+              <td>@twitter</td>
+            </tr>
+          </tbody>
+      </table>
+      <h1>Affordability</h1>
+    <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Neighbourhood</th>
+            <th scope="col">District</th>
+            <th scope="col">Km</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>Larry</td>
+            <td>the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
   </div>
 
   

@@ -170,20 +170,38 @@ function mouseInToRegion(e) {
     let value = 0;
     if(distanceShowing){
         type = "Distance";
+
         value = e.feature.getProperty('Distance');
         var percent = (value - distanciaMin) /
                 (distanciaMax - distanciaMin) * 100;
-                console.log(percent);
-                document.getElementById('data-box2').style.display = 'block';
-                value = Math.round((value/1000) * 100) / 100 + "Km";
+                
+
+    document.getElementById('data-box2').style.display = 'block';
+    value = Math.round((value/1000) * 100) / 100 + "Km";
+    document.getElementById('data-caret').style.display = 'block';
+    
     }
+
     else if(safetyShowing){
         type = "Crimes";
         value = e.feature.getProperty('Crimes');
         var percent = (value - crimesMin) /
                 (crimesMax - crimesMin) * 100;
-                console.log(percent);
-                document.getElementById('data-box2').style.display = 'block';
+                
+    document.getElementById('data-box2').style.display = 'block';
+    document.getElementById('data-caret').style.display = 'block';
+    
+    }
+
+    else if(afforabilityShowing){
+        type = "Low Income";
+        value = e.feature.getProperty('Affordability');
+        var percent = (value - afforMin) /
+                (afforMax - afforMin) * 100;
+                
+    document.getElementById('data-box2').style.display = 'block';
+    document.getElementById('data-caret').style.display = 'block';
+    
     }
 
     document.getElementById('data-box').style.display = 'block';
@@ -194,7 +212,6 @@ function mouseInToRegion(e) {
     document.getElementById('data-label2').textContent =  type;
     document.getElementById('data-value2').textContent =   value;
 
-    document.getElementById('data-caret').style.display = 'block';
     document.getElementById('data-caret').style.paddingLeft = percent + '%';
 
 
@@ -223,15 +240,20 @@ function mouseInToRegion(e) {
     }
 
     if (BoroCD >= 100 && BoroCD < 200) {
+      feature.setProperty("Neigbourhood", "Manhattan");
       color = "red";
     } else if (BoroCD >= 200 && BoroCD < 300) {
       color = "green";
+      feature.setProperty("Neigbourhood", "Bronx");
     } else if (BoroCD >= 300 && BoroCD < 400) {
       color = "yellow";
+      feature.setProperty("Neigbourhood", "Brooklyn");
     } else if (BoroCD >= 400 && BoroCD < 500) {
       color = "black";
+      feature.setProperty("Neigbourhood", "Queens");
     } else {
       color = "blue";
+      feature.setProperty("Neigbourhood", "Staten Island");
     }
     
     //Last element on features

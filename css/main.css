@@ -112,7 +112,30 @@ body {
     height: 20px;
   }
   #legend { display: flex; display: -webkit-box; padding-top: 7px }
+  
   .color-key {
+    background: linear-gradient(to right, rgba(255,0,99,1), rgba(255,0,99,0));
+    flex: 1;
+    -webkit-box-flex: 1;
+    margin: 0 5px;
+    text-align: left;
+    font-size: 1.0em;
+    line-height: 1.0em;
+    display: none;
+    
+  }
+  .color-key2 {
+    background: linear-gradient(to right, rgba(51,255,252,0), rgba(51,255,252,1));
+    flex: 1;
+    -webkit-box-flex: 1;
+    margin: 0 5px;
+    text-align: left;
+    font-size: 1.0em;
+    line-height: 1.0em;
+    display: none;
+    
+  }
+  .color-key3 {
     background: linear-gradient(to right,
       hsl(5, 69%, 54%) 0%,
       hsl(29, 71%, 51%) 17%,
@@ -127,6 +150,8 @@ body {
     text-align: left;
     font-size: 1.0em;
     line-height: 1.0em;
+    display: none;
+    
   }
 
   
