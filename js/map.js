@@ -241,6 +241,7 @@ function mouseInToRegion(e) {
 
     if (BoroCD >= 100 && BoroCD < 200) {
       feature.setProperty("Neigbourhood", "Manhattan");
+      
       color = "red";
     } else if (BoroCD >= 200 && BoroCD < 300) {
       color = "green";
@@ -251,9 +252,11 @@ function mouseInToRegion(e) {
     } else if (BoroCD >= 400 && BoroCD < 500) {
       color = "black";
       feature.setProperty("Neigbourhood", "Queens");
-    } else {
+    } else if(BoroCD >= 500 && BoroCD < 600) {
       color = "blue";
       feature.setProperty("Neigbourhood", "Staten Island");
+    } else {
+        console.log("Error setting names at " + BoroCD);
     }
     
     //Last element on features

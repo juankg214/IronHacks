@@ -44,7 +44,7 @@ let manhattan = [],
   bronx = [],
   brooklyn = [],
   queens = [],
-  statenislan = [];
+  statenisland = [];
 /* *************************************************************** */
 
 $(document).ready(function () {
@@ -82,11 +82,14 @@ $(document).ready(function () {
 
   crimes_ny = getData("https://data.cityofnewyork.us/resource/9s4h-37hy.json?cmplnt_fr_dt=2015-12-31");
   crimes_ny.then(function (data) {
+    console.log(data);
     setTimeout(function () {
       for (let index in data) {
-        puntosCrimenes.push(new google.maps.LatLng(data[index].lat_lon.coordinates[1], data[index].lat_lon.coordinates[0]));
+       let coordinates =  new google.maps.LatLng(data[index].lat_lon.coordinates[1], data[index].lat_lon.coordinates[0])
+       let neigh = data[index].boro_nm;
+       puntosCrimenes.push([coordinates, neigh ]);
       }
-      crimes();
+      //crimes();
     }, 3000);
   })
   /* ********************************************************* */
@@ -189,13 +192,7 @@ function calculateDistanceAndStuff() {
 
   map.data.forEach(function (feature) {
 
-    feature.setProperty("Affordability", affor[feature.getProperty("BoroCD")]);
-    if (feature.getProperty("Affordability") < afforMin) {
-      afforMin = feature.getProperty("Affordability");
-    }
-    if (feature.getProperty("Affordability") > afforMax) {
-      afforMax = feature.getProperty("Affordability");
-    }
+
 
     let distanciaPolig; //Distance of polygon from NYU
     let gaGeom = feature.getGeometry(); //Getting geometry form GeoJSON
@@ -209,6 +206,17 @@ function calculateDistanceAndStuff() {
       map.data.remove(feature); // We remove it
 
     } else {
+
+      feature.setProperty("Affordability", affor[feature.getProperty("BoroCD")]);
+      if (feature.getProperty("Affordability") < afforMin) {
+        afforMin = feature.getProperty("Affordability");
+      }
+      if (feature.getProperty("Affordability") > afforMax) {
+        afforMax = feature.getProperty("Affordability");
+      }
+
+      let neigh = feature.getProperty("Neigbourhood");
+      
 
       if (poly.length == 1) { //If it's multypoligon
         feature.setProperty("Type", "MultiPolygon");
@@ -227,7 +235,21 @@ function calculateDistanceAndStuff() {
 
         }
         listMultiPolygons.push([auxpol, feature.getProperty("BoroCD")]);
-
+        
+        if(neigh == "Manhattan"){
+          manhattan.push([auxpol, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Bronx"){
+          bronx.push([auxpol, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Brooklyn"){
+          brooklyn.push([auxpol, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Queens"){
+          queens.push([auxpol, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Staten Island"){
+          statenisland.push([auxpol, feature.getProperty("BoroCD")]);
+        } else{
+          console.log("Error Name not found at " + BoroCD);
+        }
+ 
         /* *************************************************** */
 
         let centermid = polygonCenter(polygon); // It returns the center of polygon in latLNG;
@@ -249,6 +271,19 @@ function calculateDistanceAndStuff() {
         });
 
         listPolygons.push([polygon, feature.getProperty("BoroCD")]); //We add it to the list
+        if(neigh == "Manhattan"){
+          manhattan.push([polygon, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Bronx"){
+          bronx.push([polygon, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Brooklyn"){
+          brooklyn.push([polygon, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Queens"){
+          queens.push([polygon, feature.getProperty("BoroCD")]);
+        } else if(neigh == "Staten Island"){
+          statenisland.push([polygon, feature.getProperty("BoroCD")]);
+        } else{
+          console.log("Error Name not found at " + BoroCD);
+        }
         let centermid = polygonCenter(polygon); //We get the center in latLng
 
         distanciaPolig = getDistance(nyuLat, nyuLng, centermid.lat(), centermid.lng()); // We get the distance
@@ -279,6 +314,8 @@ function calculateDistanceAndStuff() {
 }
 
 function crimes() {
+
+
   map.data.forEach(function (feature) {
 
     let type = feature.getProperty("Type");
