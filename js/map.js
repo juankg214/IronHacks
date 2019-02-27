@@ -2,7 +2,7 @@
   function onGoogleMapResponse(){
    
     map = new google.maps.Map(document.getElementById('googleMapContainer'), {
-      center: {lat: 40.730610, lng: -73.935242},
+      center: {lat: 40.7291, lng: -73.9965},
       zoom: 11,
       styles:[
     {
@@ -202,6 +202,15 @@ function mouseInToRegion(e) {
     document.getElementById('data-box2').style.display = 'block';
     document.getElementById('data-caret').style.display = 'block';
     
+    } else if (combineStatus){
+        type = "Score";
+        value = e.feature.getProperty('Average');
+        var percent = (value - averageMin) /
+                (averageMax - averageMin) * 100;
+                
+    document.getElementById('data-box2').style.display = 'block';
+    document.getElementById('data-caret').style.display = 'block';
+
     }
 
     document.getElementById('data-box').style.display = 'block';
@@ -213,6 +222,7 @@ function mouseInToRegion(e) {
     document.getElementById('data-value2').textContent =   value;
 
     document.getElementById('data-caret').style.paddingLeft = percent + '%';
+    document.getElementById('data-caret').style.paddingTop = 1 + '%';
 
 
 

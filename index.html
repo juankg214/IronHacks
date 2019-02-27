@@ -14,7 +14,7 @@
 <body>
 
   <!-- *********************Navbar************ -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg  navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" href="#">NYU House Searching</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,71 +32,185 @@
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
               <a class="nav-link" href="#">Information <span class="sr-only">(current)</span></a>
+              
     </div>
   </nav>
-  <!-- *************************************** -->
-  <div class="animationload">
-      <div class="osahanloading"></div>
-  </div>
-  <!-- *********************Google Map************ -->
-  <div class="container-fluid">
-    <div class="row">
-        <div id="controls" class="nicebox">
-            <div>
-            <select id="census-variable" onchange="changeOption()">
-              <option value="select-option">- select option -</option>
-              <option value="Distance">Distance
-              </option>
-              <option value="Safety">Safety</option>
-              <option value="Affordability">Affordability</option>
-      
-            </select>
-            </div>
-            <div id="legend">
-              
-              <div id="census-min"></div>
-              <div class="color-key" id="colors"><span id="data-caret">&#x25c6;</span></div>
-              <div id="census-max"></div>
-            
-            </div>
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Combine Data</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-          <div id="data-box" class="nicebox">
-            <label id="data-label" for="data-value"></label>
-            <span id="data-value"></span>
+          <div class="modal-body">
+            Here you can set the percentages of the three metrics according to your needs:
+              <div class="input-group my-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Distance</span>
+                  </div>
+                  <input type="number" min="0" max="100" placeholder="33" id="percentageDistance" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                </div>
+                
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Safety</span>
+                  </div>
+                  <input type="number" min="0" max="100" placeholder="33" id="percentageSafety" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                </div>
+                
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="inputGroup-sizing-default">Affordability</span>
+                    </div>
+                    <input type="number" min="0" max="100" placeholder="33" id="percentageAffordability"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                  </div>
+                  <div class="alert alert-warning" id="alert" role="alert">
+                      The sum of all percentages shouldn't be greater than 100 !!
+                    </div>
           </div>
-          <div id="data-box2" class="nicebox">
-            <label id="data-label2" for="data-value2"></label>
-            <span id="data-value2"></span>
-          </div>
-      <!-- <div class="col-2 bg-dark my-3">
-        <div class="d-flex justify-content-center mt-3">
-          <h5 class="text-white">Metrics</h4>
-        </div>
-        <div class="d-flex justify-content-start mt-5">
-          <button type="button" id="safetyBtn" class="btn btn-secondary">Safety</button>
-        </div>
-        <div class="d-flex justify-content-start mt-3">
-          <button type="button" id="distanceBtn" class="btn btn-secondary">Distance</button>
-        </div>
-        <div class="d-flex justify-content-start my-3">
-          <button type="button" class="btn btn-secondary">Affordability </button>
-        </div>
-        <p class="text-white mt-5"> Choose your ideal percentages for each metric!!</p>
-      </div> -->
-      <div class="col-12">
-        <div id="googleMapContainer" class="mt-3">
-        </div>
-        <div class="d-flex justify-content-end mt-3">
-          <div class="btn-toolbar">
-            <button type="button" id="distanceBtn" class="btn btn-primary ml-2">Clean</button>
-            
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" id="changePercentages" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
     </div>
+  <!-- *************************************** -->
+  <div class="animationload">
+      <div class="osahanloading">
+        <H1>LOADING..</H1>
+      </div>
+      <h1 id="loadingText">Calculating Distance and Affordability</h1>
+      
+  </div>
+
+
+    
+  <!-- *********************Google Map************ -->
+  <form>
+      
+      <div class="form-group">
+          <select class="form-control" id="census-variable" onchange="changeOption()">
+              <option selected value="selectoption" >Select Option</option>
+              <option value="Distance">Distance</option>
+              <option value="Safety">Safety</option>
+              <option value="Affordability">Affordability</option>
+              <option value="combine">Combine All Three</option>
+          </select>
+        </div>
+      </form>
+      <div id="legend">
+        
+          <div id="census-min" class="mx-2 mb-1"></div>
+          <div class="color-key" id="colors"><span id="data-caret">&#x25c6;</span></div>
+          <div id="census-max" class="mx-2 mb-1"></div>
+        
+        </div>
+  
+    <div id="data-box" class="nicebox">
+        <label id="data-label" for="data-value"></label>
+        <span id="data-value"></span>
+      </div>
+      <div id="data-box2" class="nicebox">
+        <label id="data-label2" for="data-value2"></label>
+        <span id="data-value2" class="mb-1"></span>
+      </div>
+  <div class="container-fluid">
+    
+    <div class="row mt-5">
+      
+      <div class="col-7">
+          
+        <div id="googleMapContainer">
+           
+        </div>
+        <div class="d-flex  mt-2">
+          <div class="btn-toolbar">
+            <button type="button" id="distanceBtn" class="btn btn-primary my-2">Clean</button>
+            <button type="button"  data-toggle="modal" class="btn btn-primary my-2"  data-target="#exampleModal">Percentages</button>
+          
+            <div class="custom-control custom-switch ml-2 mt-3">
+                <input type="checkbox" class="custom-control-input" id="customSwitches" onchange="">
+                <label class="custom-control-label" for="customSwitches">Show houses</label>
+              </div>
+          </div>
+          <div class="custom-control custom-switch ml-2 mt-3">
+              <input type="checkbox" class="custom-control-input" id="museum" onchange="">
+              <label class="custom-control-label" for="museum">Show Museums</label>
+            </div>
+            <div class="custom-control custom-switch ml-2 mt-3">
+                <input type="checkbox" class="custom-control-input" id="art" onchange="">
+                <label class="custom-control-label" for="art">Show Art Galleries</label>
+              </div>
+              
+        </div>
+      </div>
+      <div class="col-5">
+          <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <table class="table table-hover table-dark" id="distanceExport">
+                        <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Neighbourhood</th>
+                          <th scope="col">District</th>
+                          <th scope="col">Km</th>
+                        </tr>
+                      </thead>
+                      <tbody id="distanceTable">
+                     </table>
+                </div>
+                <div class="carousel-item">
+                    <table class="table table-hover table-dark" id="safetyExport">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Neighbourhood</th>
+                        <th scope="col">District</th>
+                        <th scope="col">Crimes</th>
+                      </tr>
+                    </thead>
+                    <tbody id="safetyTable">
+                      
+                    
+                </table>
+                </div>
+                <div class="carousel-item">
+                    <table class="table table-striped table-dark">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Neighbourhood</th>
+                            <th scope="col">District</th>
+                            <th scope="col">Low Income</th>
+                          </tr>
+                        </thead>
+                        <tbody id="afforTable">
+                         
+                      </table>
+                </div>
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+          
+          
+
+      </div>
+    </div>
   </div>
   <div class="container-fluid mt-4" id="tables">
-    <h1>Distance</h1>
+    <!-- <h1>Distance</h1>
     <table class="table table-hover table-dark" id="distanceExport">
         <thead>
         <tr>
@@ -107,77 +221,13 @@
         </tr>
       </thead>
       <tbody id="distanceTable">
-        
-        
-      </table>
+     </table> -->
 
       <div class="d-flex justify-content-end mb-3">
           <div class="btn-toolbar">
             <button type="button" id="CSVdistance" class="btn btn-primary ml-2">Export CSV</button>
             </div>
         </div>
-      <h1>Safety</h1>
-      <table class="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Neighbourhood</th>
-              <th scope="col">District</th>
-              <th scope="col">Km</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Larry</td>
-              <td>the Bird</td>
-              <td>@twitter</td>
-            </tr>
-          </tbody>
-      </table>
-      <h1>Affordability</h1>
-    <table class="table table-striped table-dark">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Neighbourhood</th>
-            <th scope="col">District</th>
-            <th scope="col">Km</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-          </tr>
-        </tbody>
-      </table>
   </div>
 
   
